@@ -1,8 +1,9 @@
-// function initWS(websocket){
-//     websocket.addEventListener("open", ()=>{
-
-//     })
-// }
+function initWS(websocket){
+    websocket.addEventListener("open", ()=>{
+        let data = {"type":"open"}
+        websocket.send(JSON.stringify(data))
+    })
+}
 
 const createOption = (data)=> {
     const select = document.querySelector(".form-select");
@@ -14,6 +15,18 @@ const createOption = (data)=> {
     }
 }
 
+const handleLiveTweets = (data)=> {
+
+    const listContainer = document.querySelector('#live-tweets > ul');
+    const content = document.createElement("li");
+    content.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-start")
+    content.innerHTML = `
+        <div class="ms-2 me-auto"><div class="fw-bold">@${data.name}</div>${data.text}</div>
+        <span class="badge bg-success">${data.time}</span>
+    `
+    listContainer.appendChild(content);
+}
+
 function receiveMessages(websocket){
     websocket.addEventListener("message", ({ data })=> {
         const parsedData = JSON.parse(data);
@@ -22,7 +35,7 @@ function receiveMessages(websocket){
                 createOption(parsedData.places)
                 break;
             case "tweets":
-                console.log(parsedData.tweets)
+                handleLiveTweets(parsedData)
                 break;
         }
 
@@ -33,6 +46,7 @@ window.addEventListener("DOMContentLoaded", ()=> {
 
     // create ws
     const websocket = new WebSocket("ws://localhost:8001/");
+    initWS(websocket);
     receiveMessages(websocket);
 });
 
