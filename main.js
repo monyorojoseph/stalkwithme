@@ -65,10 +65,20 @@ const receiveMessages =  (websocket)=> {
     });
 }
 
+function getWebSocketServer() {
+    if (window.location.host === "aaugustin.github.io") {
+      return "wss://stalkwithme.herokuapp.com/";
+    } else if (window.location.host === "localhost:8000") {
+      return "ws://localhost:8001/";
+    } else {
+      throw new Error(`Unsupported host: ${window.location.host}`);
+    }
+}
+
 window.addEventListener("DOMContentLoaded", ()=> {
     const body = document.querySelector("#body")
     // create ws
-    const websocket = new WebSocket("ws://localhost:8001/");
+    const websocket = new WebSocket(getWebSocketServer());
     initWS(websocket);
     receiveMessages(websocket);
 });
