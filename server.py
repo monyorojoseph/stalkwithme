@@ -1,11 +1,16 @@
-import tweepy, logging, json, asyncio, websockets
+import tweepy, os, signal, json, asyncio, websockets
 from decouple import config
 from tweepy.asynchronous import AsyncStream
 
-CONSUMER_KEY=config('CONSUMER_KEY')
-CONSUMER_SECRET=config('CONSUMER_SECRET')
-ACCESS_TOKEN=config('ACCESS_TOKEN')
-ACCESS_TOKEN_SECRET=config('ACCESS_TOKEN_SECRET')
+CONSUMER_KEY='hiGbtbeGwBwgwEBccj4oteKAF'
+CONSUMER_SECRET='WFZXFeAWC8LVGYOGVTMbevOKwib092j1RUEtwwMGtY7CQe5VyH'
+ACCESS_TOKEN='1417225484971085827-vXozJSDAUOTwwyC3xkeI6z0Mfzwdtf'
+ACCESS_TOKEN_SECRET='4qzPCkx7lvKIxYlhXMpeyzhDdsZaO02iuJTKZEX4TO3Sd'
+
+# CONSUMER_KEY=config('CONSUMER_KEY')
+# CONSUMER_SECRET=config('CONSUMER_SECRET')
+# ACCESS_TOKEN=config('ACCESS_TOKEN')
+# ACCESS_TOKEN_SECRET=config('ACCESS_TOKEN_SECRET')
 
 # streamin class
 class AsyncStreamListener(AsyncStream):
@@ -51,7 +56,7 @@ async def mainTwitterHandler(websocket):
     await twitterPlaces(websocket)
     await asyncio.sleep(0.1)
     strm = AsyncStreamListener(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, websocket)
-    strm.filter(track=["python"], languages=['en'])
+    strm.filter(track=["spiderman"], languages=['en'])
     
     async for message in websocket:
         print('yes', id(message))
@@ -66,7 +71,12 @@ async def handler(websocket):
 
 # initiating ws
 async def main():
-    async with websockets.serve(handler, "localhost", 8001):
-        await asyncio.Future()  # run forever
+    loop = asyncio.get_running_loop()
+    stop = loop.create_future()
+    loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+    port = int(os.environ.get("PORT", "8001"))
+    async with websockets.serve(handler, "", port):
+        await stop  # run forever
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

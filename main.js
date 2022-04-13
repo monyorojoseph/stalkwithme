@@ -1,9 +1,3 @@
-function initWS(websocket){
-    websocket.addEventListener("open", ()=>{
-        let data = {"type":"open"}
-        websocket.send(JSON.stringify(data))
-    })
-}
 
 const createOption = (data)=> {
     const select = document.querySelector(".form-select");
@@ -27,29 +21,6 @@ const handleLiveTweets = (data)=> {
     listContainer.appendChild(content);
 }
 
-function receiveMessages(websocket){
-    websocket.addEventListener("message", ({ data })=> {
-        const parsedData = JSON.parse(data);
-        switch(parsedData.type){
-            case "places":
-                createOption(parsedData.places)
-                break;
-            case "tweets":
-                handleLiveTweets(parsedData)
-                break;
-        }
-
-    });
-}
-
-window.addEventListener("DOMContentLoaded", ()=> {
-
-    // create ws
-    const websocket = new WebSocket("ws://localhost:8001/");
-    initWS(websocket);
-    receiveMessages(websocket);
-});
-
 const place = document.querySelector(".place");
 document.querySelector(".form-select").addEventListener("change", (e)=>{
     place.innerText = e.target.options[e.target.selectedIndex].text;
@@ -69,3 +40,35 @@ document.querySelector("#topic").addEventListener("keyup", (e)=> {
 
     }
 })
+
+
+const initWS = (websocket) =>{
+    websocket.addEventListener("open", ()=>{
+        let data = {"type":"open"}
+        websocket.send(JSON.stringify(data))
+    })
+}
+
+const receiveMessages =  (websocket)=> {
+    websocket.addEventListener("message", ({ data })=> {
+        const parsedData = JSON.parse(data);
+        switch(parsedData.type){
+            case "places":
+                localStorage.setItem("places",JSON.stringify(parsedData.places))
+                createOption(parsedData.places)
+                break;
+            case "tweets":
+                handleLiveTweets(parsedData)
+                break;
+        }
+
+    });
+}
+
+window.addEventListener("DOMContentLoaded", ()=> {
+    const body = document.querySelector("#body")
+    // create ws
+    const websocket = new WebSocket("ws://localhost:8001/");
+    initWS(websocket);
+    receiveMessages(websocket);
+});
