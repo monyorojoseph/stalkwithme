@@ -66,7 +66,7 @@ const receiveMessages =  (websocket)=> {
 }
 
 function getWebSocketServer() {
-    if (window.location.host === "aaugustin.github.io") {
+    if (window.location.host === "monyorojoseph.github.io") {
       return "wss://stalkwithme.herokuapp.com/";
     } else if (window.location.host === "localhost:8000") {
       return "ws://localhost:8001/";
